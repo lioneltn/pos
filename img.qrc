@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/Mask.png</file>
+        <file>img/Rectangle_8.png</file>
+        <file>img/Oval_4.png</file>
+        <file>img/Oval_5.png</file>
+        <file>img/show.png</file>
+        <file>img/Rectangle_12.png</file>
+        <file>img/background.png</file>
+        <file>img/bg.png</file>
+        <file>img/icons_user.png</file>
+        <file>img/Stroke_1.png</file>
+        <file>img/base.png</file>
+        <file>img/back.png</file>
+        <file>img/Oval_3.png</file>
+        <file>img/show1.png</file>
+        <file>img/green.png</file>
+        <file>img/default-user.png</file>
+        <file>img/bar.png</file>
+        <file>img/pos_back.png</file>
+        <file>img/pay.png</file>
+        <file>img/blue.png</file>
+        <file>img/red.png</file>
+        <file>img/bg1.png</file>
+        <file>img/button.png</file>
+        <file>img/png/search.png</file>
+        <file>img/png/settings.png</file>
+        <file>img/Rectangle_2.png</file>
+        <file>img/cutmypic.png</file>
+        <file>img/png/house.png</file>
+    </qresource>
+</RCC>

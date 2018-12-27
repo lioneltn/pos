@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/">
+        <file>src/emailaddress.cpp</file>
+        <file>src/emailaddress.h</file>
+        <file>src/mimeattachment.cpp</file>
+        <file>src/mimeattachment.h</file>
+        <file>src/mimecontentformatter.cpp</file>
+        <file>src/mimecontentformatter.h</file>
+        <file>src/mimefile.cpp</file>
+        <file>src/mimefile.h</file>
+        <file>src/mimehtml.cpp</file>
+        <file>src/mimehtml.h</file>
+        <file>src/mimeinlinefile.cpp</file>
+        <file>src/mimeinlinefile.h</file>
+        <file>src/mimemessage.cpp</file>
+        <file>src/mimemessage.h</file>
+        <file>src/mimemultipart.cpp</file>
+        <file>src/mimemultipart.h</file>
+        <file>src/mimepart.cpp</file>
+        <file>src/mimepart.h</file>
+        <file>src/mimetext.cpp</file>
+        <file>src/mimetext.h</file>
+        <file>src/quotedprintable.cpp</file>
+        <file>src/quotedprintable.h</file>
+        <file>src/smtpclient.cpp</file>
+        <file>src/smtpclient.h</file>
+        <file>src/smtpexports.h</file>
+        <file>src/SmtpMime</file>
+    </qresource>
+</RCC>
