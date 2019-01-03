@@ -9,8 +9,8 @@ Client::Client()
 Client::~Client(){
 
 }
-Client::Client(int ID){
-    ID=ID;
+Client::Client(int ID1){
+    ID=ID1;
 
 
         QSqlQuery query;

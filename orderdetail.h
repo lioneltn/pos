@@ -21,7 +21,7 @@ public:
     OrderDetail();
     OrderDetail(int ID_produit,int ID_com);
     void setQte(int Qte1);
-    void setTotal(int Qte1);
+    void setTotal(float total1);
     int getID();
     int getIDCom();
     int getIDProduit();
@@ -31,7 +31,7 @@ public:
     float getTotal();
     QString getName();
     QString getPhoto();
-
+    ~OrderDetail();
 
 };
 

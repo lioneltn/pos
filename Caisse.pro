@@ -7,6 +7,7 @@
 QT       += core gui
 QT       += sql
 QT += network
+QT += serialport
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -47,6 +48,8 @@ SOURCES += \
     QRoundProgressBar.cpp \
     productform.cpp \
     ProgressCircle.cpp \
+    calc.cpp \
+    arduino.cpp
 
     functions.cpp \
 
@@ -75,6 +78,8 @@ HEADERS += \
     QRoundProgressBar.h \
     productform.h \
     ProgressCircle.h \
+    calc.h \
+    arduino.h
 
 
 
@@ -91,7 +96,8 @@ FORMS += \
     caisse1.ui \
     reset.ui \
     register.ui \
-    productform.ui
+    productform.ui \
+    calc.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

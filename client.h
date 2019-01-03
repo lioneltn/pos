@@ -6,7 +6,7 @@ class Client
 {
 public:
     Client();
-    Client(int ID);
+    Client(int ID1);
     QString getName();
     QString getSurname();
     QString getAddress();

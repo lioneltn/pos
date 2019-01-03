@@ -28,5 +28,30 @@
         <file>img/Rectangle_2.png</file>
         <file>img/cutmypic.png</file>
         <file>img/png/house.png</file>
+        <file>img/loading.gif</file>
+        <file>img/1.png</file>
+        <file>img/0.png</file>
+        <file>img/2.png</file>
+        <file>img/3.png</file>
+        <file>img/4.png</file>
+        <file>img/5.png</file>
+        <file>img/6.png</file>
+        <file>img/7.png</file>
+        <file>img/8.png</file>
+        <file>img/9.png</file>
+        <file>img/add.png</file>
+        <file>img/divide.png</file>
+        <file>img/equal.png</file>
+        <file>img/multiply.png</file>
+        <file>img/substract.png</file>
+        <file>img/mem.png</file>
+        <file>img/mplus.png</file>
+        <file>img/msubstract.png</file>
+        <file>img/ac.png</file>
+        <file>img/plusmoins.png</file>
+        <file>img/logo.png</file>
+        <file>img/remove.png</file>
+        <file>img/close_red.png</file>
+        <file>img/stroke.png</file>
     </qresource>
 </RCC>

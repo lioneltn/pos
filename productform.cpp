@@ -6,34 +6,31 @@ Productform::Productform(class pos *p,QWidget *parent) :
     ui(new Ui::Productform)
 {
     vPos.push_back(p);
-    ProgressCircle * progressCircle;
+
     ui->setupUi(this);
-    setStyleSheet(".QWidget{border-bottom: 1px solid lightgrey;}");
-    QHBoxLayout * layout = new QHBoxLayout(this);
-    layout->setSpacing(12);
-    progressCircle = new ProgressCircle();
-    progressCircle->setFixedSize(30, 30);
-    layout->addWidget(progressCircle);
-    label = new QLabel("text");
-    layout->addWidget(label, 1);
-    QPushButton * closeButton = new QPushButton(tr("Delete"));
+
+
     //connecting two ui//
     id=p->getID();
-    ui->code->setText(QString::number(id));
-    connect(closeButton, &QPushButton::clicked, p, &pos::deleteItem);
 
 
-    connect(closeButton, &QPushButton::clicked, this, &Productform::sendID);
+    ui->product_name->setText(p->vOrder[0]->vDetails[id]->getName());
+    ui->product_id->setText(QString::number(p->vOrder[0]->vDetails[id]->getIDProduit()));
+    ui->product_price->setText(QString::number(p->vOrder[0]->vDetails[id]->getPrice()));
+    ui->product_qte->setText(QString::number(p->vOrder[0]->vDetails[id]->getQte()));
 
-    connect(closeButton, &QPushButton::clicked, this, &QObject::deleteLater);
-    layout->addWidget(closeButton);
+    connect(ui->closeButton, &QPushButton::clicked, this, &Productform::sendID);
+    connect(ui->closeButton, &QPushButton::clicked, p, &pos::deleteItem);
+    connect(ui->closeButton, &QPushButton::clicked, this, &QObject::deleteLater);
+    connect(ui->add, &QPushButton::clicked, this, &Productform::sendID);
 
-    QPropertyAnimation * progressCircleAnimation = new QPropertyAnimation(progressCircle, "outerRadius", progressCircle);
-    progressCircleAnimation->setDuration(750);
-    progressCircleAnimation->setEasingCurve(QEasingCurve::OutQuad);
-    progressCircleAnimation->setStartValue(0.0);
-    progressCircleAnimation->setEndValue(1.0);
-    progressCircleAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+    connect(ui->add,&QPushButton::clicked,p,&pos::updateQte);
+
+    connect(ui->remove, &QPushButton::clicked, this, &Productform::sendID);
+
+    connect(ui->remove,&QPushButton::clicked,p,&pos::updateQte2);
+
+
 
 
 }
@@ -69,6 +66,7 @@ void finish(bool success)
 Productform::~Productform()
 {
     delete ui;
+
 }
 
 void Productform::setIDD(int i)
@@ -83,11 +81,21 @@ int Productform::getIDD()
 
 void Productform::on_add_clicked()
 {
-    ui->code->setText("Loool");
+    vPos[0]->vOrder[0]->vDetails[id]->setQte(vPos[0]->vOrder[0]->vDetails[id]->getQte()+1);
+    int qte=vPos[0]->vOrder[0]->vDetails[id]->getQte();
+    ui->product_qte->setText(QString::number(qte));
 }
 
 bool Productform::sendID(){
    vPos[0]->del=id;
 
 
+
+}
+
+void Productform::on_remove_clicked()
+{
+    vPos[0]->vOrder[0]->vDetails[id]->setQte(vPos[0]->vOrder[0]->vDetails[id]->getQte()-1);
+    int qte=vPos[0]->vOrder[0]->vDetails[id]->getQte();
+    ui->product_qte->setText(QString::number(qte));
 }

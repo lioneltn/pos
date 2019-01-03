@@ -1,24 +1,34 @@
 #include "pos.h"
 #include "ui_pos.h"
-#include "caisse.h"
-#include "functions.h"
-#include "session.h"
-#include "terminal.h"
 #include <QScrollArea>
 #include <QSqlQuery>
 #include <QSqlTableModel>
 #include "client.h"
+#include <QMovie>
+#include "calc.h"
+#include <QDateTime>
+
 
 pos::pos(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::pos)
 {
     ui->setupUi(this);
+    QString DATE=QDateTime::currentDateTime().toString("dddd dd MMMM yyyy");
+    QString TIME=QDateTime::currentDateTimeUtc().toString();
+    ui->date->setText(DATE);
+    ui->time->setText(TIME);
 
+    //**Adding Loading Gif to load Label**//
+    QMovie *movie = new QMovie(":/img/loading.gif");
+    ui->load->setMovie(movie);
+    ui->load->show();
+    movie->start();
 
 
 
     ui->stackedWidget->setCurrentIndex(0);
+    ui->stackedWidget_2->setCurrentIndex(0);
     QPixmap pix(":/img/pos_back.png");
     pix = pix.scaled(this->size(), Qt::IgnoreAspectRatio);
     QPalette palette;
@@ -32,12 +42,12 @@ pos::pos(QWidget *parent) :
     ui->back->setPixmap(back);
 
 
-    QPixmap bar(":/img/bar.png");
-    ui->bar->setPixmap(bar);
+
 
 
     //Starting Terminal
-    Terminal terminal;
+    Terminal *terminal=new Terminal();
+    vTerminal.push_back(terminal);
 
     //Starting Employer
     QSqlQuery query;
@@ -68,7 +78,8 @@ pos::pos(QWidget *parent) :
     ui->user_photo->setScaledContents(true);
 
     //Starting Session
-    Session session(user->getID(),terminal.getID());
+    Session *session =new Session(user->getID(),terminal->getID());
+    vSessions.push_back(session);
 
 
     //Circular Progress Bar
@@ -88,34 +99,58 @@ pos::pos(QWidget *parent) :
     ui->RoundBar2->setBarStyle(QRoundProgressBar::StyleLine);
     ui->RoundBar2->setOutlinePenWidth(18);
     ui->RoundBar2->setDataPenWidth(10);
-    connectToSlider(ui->RoundBar2,session.getNbrVente()+55);
+    connectToSlider(ui->RoundBar2,session->getNbrVente());
 
 /***Adding Product to List***/
 
-connect(ui->pushButton_6, &QPushButton::clicked, this, &pos::addIndefinite);
 
 
-}
-
-pos::~pos()
-{
-    delete ui;
-}
-
-
-bool pos::deleteItem(){
-
-
-    delete ui->listWidget->takeItem(del-1);
-    ui->name->setText(QString::number(del));
-    return true;
+connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)),
+            this, SLOT(itemClickedSlot(QListWidgetItem*)));
 
 }
+
+
+
+
+
 
 bool pos::receiveID(int id)
 {
     ui->name->setText(QString::number(id+20));
 }
+
+bool pos::updateQte()
+{
+   this->vOrder[0]->vDetails[del]->setTotal(this->vOrder[0]->vDetails[del]->getQte()*this->vOrder[0]->vDetails[del]->getPrice());
+   float new_total=(this->vOrder[0]->getTotal())+(this->vOrder[0]->vDetails[del]->getPrice());
+   this->vOrder[0]->setTotal(new_total);
+   ui->total_int->setText(QString::number(this->vOrder[0]->getTotal()));
+
+   float vat=this->vOrder[0]->getTotal()*21/100;
+   float subtotal=this->vOrder[0]->getTotal()-vat;
+   ui->subtotal_int->setText(QString::number(subtotal));
+   ui->vat_int->setText(QString::number(vat));
+
+
+}
+
+bool pos::updateQte2()
+{
+    this->vOrder[0]->vDetails[del]->setTotal(this->vOrder[0]->vDetails[del]->getQte()*this->vOrder[0]->vDetails[del]->getPrice());
+    float new_total=(this->vOrder[0]->getTotal())-(this->vOrder[0]->vDetails[del]->getPrice());
+    this->vOrder[0]->setTotal(new_total);
+    ui->total_int->setText(QString::number(this->vOrder[0]->getTotal()));
+
+    float vat=this->vOrder[0]->getTotal()*21/100;
+    float subtotal=this->vOrder[0]->getTotal()-vat;
+    ui->subtotal_int->setText(QString::number(subtotal));
+    ui->vat_int->setText(QString::number(vat));
+
+}
+
+
+
 
 void pos::setID(int j)
 {
@@ -133,7 +168,7 @@ void pos::addIndefinite()
 {
     //**Adding Product form to QlistWidget**//
 
-        Productform * item = new Productform(this);
+       /* Productform * item = new Productform(this);
         this->setID(this->getID()+1);
 
 
@@ -149,7 +184,7 @@ void pos::addIndefinite()
         ui->listWidget->setItemWidget(item1,item);
 
 
-
+*/
 }
 
 
@@ -161,32 +196,11 @@ void pos::connectToSlider(QRoundProgressBar *bar,int nbr)
 
 }
 
-void pos::on_pushButton_2_clicked()
-{
 
-
-ui->stackedWidget->setCurrentIndex(3);
-//Getting User ID from Arduino
-Client client(1);
-//User Info Card
-ui->name->setText(client.getName());
-ui->ID->setText(QString::number(client.getID()));
-ui->ADD->setText(client.getAddress());
-ui->EMAIL->setText(client.getEmail());
-ui->PHONE->setText(client.getTel());
-ui->POINTS->setText(QString::number(client.getPt()));
-
-QString photo1=":"+client.getPhoto();
-QPixmap profile(photo1);
-ui->clientphoto->setPixmap(profile);
-ui->clientphoto->setScaledContents(true);
-
-
-}
 
 void pos::on_pushButton_4_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(2);
+    ui->stackedWidget->setCurrentIndex(3);
 }
 
 void pos::on_search_clicked()
@@ -284,4 +298,210 @@ void pos::on_pushButton_3_clicked()
 
 }
 
+void pos::on_pushButton_2_clicked()
+{
 
+ui->stackedWidget->setCurrentIndex(3);
+//Connecting to Arduino
+int ret=A.connect_arduino(); // lancer la connexion à arduino
+switch(ret){
+case(0):qDebug()<< "arduino is available and connected to : "<< A.getarduino_port_name();
+    break;
+case(1):qDebug() << "arduino is available but not connected to :" <<A.getarduino_port_name();
+   break;
+case(-1):qDebug() << "arduino is not available";
+}
+
+
+ //END ARDUINO//
+QObject::connect(A.getserial(),SIGNAL(readyRead()),this,SLOT(update_label()));
+QObject::connect(this,SIGNAL(mySignal()),this,SLOT(Result()));
+
+
+
+
+
+
+}
+
+void pos::on_cancel_clicked()
+{
+    QObject::connect(this,SIGNAL(mySignal()),this,SLOT(Result()));
+    result="";
+
+    i=0;
+    ui->verticalLayout->takeAt(0);
+
+    for (int j=0;j<=ui->listWidget->count();j++)
+       {
+           delete ui->listWidget->takeItem(j);
+       }
+    for (unsigned j=0;j<this->vOrder.size();j++)
+       {
+           delete this->vOrder[j];
+       }
+    vOrder.clear();
+
+    ui->stackedWidget->setCurrentIndex(3);
+    ui->stackedWidget_2->setCurrentIndex(0);
+}
+
+void pos::itemClickedSlot(QListWidgetItem *item2)
+{
+    int currentRow = ui->listWidget->currentRow();
+
+
+    QString photo=":"+this->vOrder[0]->vDetails[currentRow]->getPhoto();
+    QPixmap product(photo);
+    ui->product_photo->setPixmap(product);
+    ui->product_photo->setScaledContents(true);
+    ui->product_name->setText(this->vOrder[0]->vDetails[currentRow]->getName());
+    ui->product_price->setText(QString::number(this->vOrder[0]->vDetails[currentRow]->getPrice()));
+    ui->qte->setText((QString::number(this->vOrder[0]->vDetails[currentRow]->getQte())));
+    ui->price_int->setText(QString::number(this->vOrder[0]->vDetails[currentRow]->getPrice()));
+
+
+}
+
+bool pos::deleteItem(){
+
+
+    delete ui->listWidget->takeItem(del);
+
+    this->vOrder[0]->setTotal((this->vOrder[0]->getTotal())-(this->vOrder[0]->vDetails[del]->getTotal()));
+    ui->total_int->setText(QString::number(this->vOrder[0]->getTotal()));
+    i=i-1;
+    float vat=this->vOrder[0]->getTotal()*21/100;
+    float subtotal=this->vOrder[0]->getTotal()-vat;
+    ui->subtotal_int->setText(QString::number(subtotal));
+    ui->vat_int->setText(QString::number(vat));
+
+    return true;
+
+}
+pos::~pos()
+{
+    delete ui;
+
+    for (unsigned j=0;j<vOrder.size();j++)
+       {
+           delete this->vOrder[j];
+       }
+    vOrder.clear();
+    for (unsigned j=0;j<vTerminal.size();j++)
+       {
+           delete this->vTerminal[j];
+       }
+    vTerminal.clear();
+    for (unsigned j=0;j<vUser.size();j++)
+       {
+           delete this->vUser[j];
+       }
+    vUser.clear();
+
+}
+
+void pos::on_pay_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(4);
+}
+
+
+void pos::Result()
+{
+    QObject::disconnect(A.getserial(),SIGNAL(readyRead()),this,SLOT(update_label()));
+QObject::disconnect(this,SIGNAL(mySignal()),this,SLOT(Result()));
+
+
+ui->name->setText("Detected");
+
+ui->stackedWidget->setCurrentIndex(5);
+//Adding Calculator
+
+    Calc *calculator=new Calc();
+    ui->verticalLayout->addWidget(calculator);
+
+
+ui->stackedWidget_2->setCurrentIndex(1);
+//Getting User ID from Arduino
+
+Client client(1);
+//User Info Card
+ui->name->setText(client.getName());
+ui->ID->setText(QString::number(client.getID()));
+ui->ADD->setText(client.getAddress());
+ui->EMAIL->setText(client.getEmail());
+ui->PHONE->setText(client.getTel());
+ui->POINTS->setText(QString::number(client.getPt()));
+
+QString photo1=":"+client.getPhoto();
+QPixmap profile(photo1);
+ui->clientphoto->setPixmap(profile);
+ui->clientphoto->setScaledContents(true);
+//End of User Info Card
+
+//Starting New Order//
+Order *new_order=new Order(client.getID(),vUser[0]->getID(),vTerminal[0]->getID());
+vOrder.push_back(new_order);
+ui->name->setText(QString::number(vOrder.size()));
+//Setting Total
+ui->total_int->setText(QString::number(this->vOrder[0]->getTotal()));
+float vat=this->vOrder[0]->getTotal()*21/100;
+float subtotal=this->vOrder[0]->getTotal()-vat;
+ui->subtotal_int->setText(QString::number(subtotal));
+ui->vat_int->setText(QString::number(vat));
+
+//Populating Product List//
+
+for (unsigned j=0;j<this->vOrder[0]->vDetails.size();j++){
+Productform * item = new Productform(this);
+
+QListWidgetItem *item1 = new QListWidgetItem();
+item1->setSizeHint(QSize(0,50));
+
+
+
+ui->listWidget->addItem(item1);
+ui->listWidget->setItemWidget(item1,item);
+
+i=i+1;
+}
+result="";
+}
+
+
+void pos::update_label()
+{
+
+    data=A.read_from_arduino();
+    result+=QString::fromStdString(data.toStdString());
+    qDebug() << result;
+    emit mySignal();
+
+}
+
+void pos::on_cash_clicked()
+{
+    vOrder[0]->setPType("Cash");
+    if(vOrder[0]->saveOrderDetail()){
+        qDebug() << "Order Detail Saved";
+    }
+    if (vOrder[0]->saveOrder()){
+        qDebug() << "Order Saved";
+    }
+    if (vOrder[0]->ClearData()){
+        qDebug() << "Data Cleared";
+    }
+    vSessions[0]->setNbrVente(vSessions[0]->getNbrVente()+1);
+
+    connectToSlider(ui->RoundBar2,vSessions[0]->getNbrVente());
+
+
+    ui->stackedWidget->setCurrentIndex(0);
+
+}
+
+void pos::on_go_back_clicked()
+{
+    ui->stackedWidget->set
+}

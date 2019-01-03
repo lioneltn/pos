@@ -1,6 +1,5 @@
 #ifndef PRODUCTFORM_H
 #define PRODUCTFORM_H
-
 #include <QWidget>
 #include "ProgressCircle.h"
 #include <QLabel>
@@ -34,6 +33,8 @@ private slots:
     void on_add_clicked();
 
 
+
+    void on_remove_clicked();
 
 private:
     QVector <class pos*> vPos;
